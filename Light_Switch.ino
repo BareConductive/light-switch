@@ -20,7 +20,7 @@
 int irqpin = 3;
 
 #define touchPin 4
-#define outputPin 13
+#define outputPin 11
 
 unsigned int touchStatus=0;
 unsigned int lastTouchStatus=0; 
@@ -30,7 +30,7 @@ void setup(){
   digitalWrite(irqpin, HIGH); //enable pullup resistor
   
   pinMode(outputPin, OUTPUT);
-  digitalWrite(outputPin, LOW);
+  digitalWrite(outputPin, HIGH);
   
   #ifdef SERIAL_MODE
     Serial.begin(baudRate);
