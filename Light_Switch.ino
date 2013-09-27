@@ -19,7 +19,7 @@
 // touch shield variables
 int irqpin = 3;
 
-#define touchPin 4
+#define touchPin 11
 #define outputPin 11
 
 unsigned int touchStatus=0;
