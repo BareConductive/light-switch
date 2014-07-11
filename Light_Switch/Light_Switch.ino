@@ -1,80 +1,82 @@
-/**********************************************************
-       Bare Conductive Light Switch Demo for Kickstarter
- **********************************************************
-  
-  Code is by Stefan Dzisiewski-Smith  
+/*******************************************************************************
 
-***********************************************************/
+ Bare Conductive Light Switch Demo
+ ---------------------------------
+ 
+ Light_Switch.ino - simple touch light switch with toggle action (touch-on, 
+ touch-off)
+ 
+ Bare Conductive code written by Stefan Dzisiewski-Smith and Peter Krige.
+ 
+ This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 
+ Unported License (CC BY-SA 3.0) http://creativecommons.org/licenses/by-sa/3.0/
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
 
-// enable serial
-//#define SERIAL_MODE
+*******************************************************************************/
 
-// serial rate
-#define baudRate 57600
-
-// touch shield includes
-#include "mpr121_setup.h"
+#include <MPR121.h>
 #include <Wire.h>
 
-// touch shield variables
 int irqpin = 3;
 
-#define touchPin 11
-#define outputPin 11
-
-unsigned int touchStatus=0;
-unsigned int lastTouchStatus=0; 
+#define switchElectrode 11
+#define outputPin 13
 
 void setup(){
-  pinMode(irqpin, INPUT);
-  digitalWrite(irqpin, HIGH); //enable pullup resistor
   
   pinMode(outputPin, OUTPUT);
-  digitalWrite(outputPin, HIGH);
+  digitalWrite(outputPin, LOW);
   
-  #ifdef SERIAL_MODE
-    Serial.begin(baudRate);
-    Serial.println("Light Switch Demo"); 
-    while(!Serial);
-  #endif
-  
+  Serial.begin(9600);
   Wire.begin();
-
-  mpr121_setup();
+  
+  // 0x5C is the MPR121 I2C address on the Bare Touch Board
+  if(!MPR121.begin(0x5C)){ 
+    Serial.println("error setting up MPR121");  
+    switch(MPR121.getError()){
+      case NO_ERROR:
+        Serial.println("no error");
+        break;  
+      case ADDRESS_UNKNOWN:
+        Serial.println("incorrect address");
+        break;
+      case READBACK_FAIL:
+        Serial.println("readback failure");
+        break;
+      case OVERCURRENT_FLAG:
+        Serial.println("overcurrent on REXT pin");
+        break;      
+      case OUT_OF_RANGE:
+        Serial.println("electrode out of range");
+        break;
+      case NOT_INITED:
+        Serial.println("not initialised");
+        break;
+      default:
+        Serial.println("unknown error");
+        break;      
+    }
+    while(1);
+  }
+  
+  // pin 4 is the MPR121 interrupt on the Bare Touch Board
+  MPR121.setInterruptPin(4);
+  // initial data update
+  MPR121.updateTouchData();
 }
 
 void loop(){
-   readRawInputs();
-   #ifdef SERIAL_MODE 
-     //Serial.println(touchStatus, BIN); 
-   #endif
-
-   if(((touchStatus>>touchPin)&1) && !((lastTouchStatus>>touchPin)&1)){
-     digitalWrite(outputPin, !digitalRead(outputPin));  
-   }
-   
-   lastTouchStatus = touchStatus;
-
-}
-
-void readRawInputs(){
-  
-    uint8_t MSB, LSB;
-    uint16_t touchedVals;
-    int i, returned;
-    
-    Wire.requestFrom(MPR121_ADDR, 2);
-    LSB = Wire.read();
-    MSB = Wire.read();
-    
-    touchStatus = (unsigned int)LSB + ((unsigned int)MSB<<8);
-
-}
-
-
-
-// helper functions to keep the above code clean
-
-boolean checkInterrupt(void){
-  return digitalRead(irqpin);
+  if(MPR121.touchStatusChanged()){
+    MPR121.updateTouchData();
+    if(MPR121.isNewTouch(switchElectrode)){
+      digitalWrite(outputPin, !digitalRead(outputPin));      
+    }  
+  }
 }
