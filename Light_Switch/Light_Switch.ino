@@ -24,8 +24,6 @@
 #include <MPR121.h>
 #include <Wire.h>
 
-int irqpin = 3;
-
 #define switchElectrode 11
 #define outputPin 13
 
