@@ -5,10 +5,9 @@
 Touch sensitive light switch with a touch-on, touch-off toggle action. Designed to run on the [Touch Board](http://www.bareconductive.com/shop/touch-board/).
 
 ## Requirements
-* [Arduino](http://arduino.cc/en/Main/Software) 1.0.5 or 1.5.6+ (1.5.6+ is strongly preferred).
+* [Arduino](http://arduino.cc/en/Main/Software) 1.5.6 or later
 
 * Arduino's instructions for installing libraries are available [here](http://arduino.cc/en/Guide/Libraries)
-
 	
 * [Bare Conductive MPR121 library](https://github.com/bareconductive/mpr121) (zip file download [here](https://github.com/bareconductive/mpr121/archive/public.zip))
 
