@@ -66,6 +66,16 @@ void setup(){
   
   // pin 4 is the MPR121 interrupt on the Bare Touch Board
   MPR121.setInterruptPin(4);
+
+  MPR121.setTouchThreshold(40);     // this is the threshold at which the board senses a touch
+                                    // higher values are less sensitive, lower values are more sensitive
+                                    // for proximity operation, you could try a value of 6
+
+  MPR121.setReleaseThreshold(20);   // this is the threshold at which the board senses a release
+                                    // higher values are less sensitive, lower values are more sensitive
+                                    // for proximity operation, you could try a value of 3
+                                    // this must ALWAYS be lower than the touch threshold
+
   // initial data update
   MPR121.updateTouchData();
 }
