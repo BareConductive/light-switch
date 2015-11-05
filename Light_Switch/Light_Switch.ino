@@ -21,6 +21,9 @@
 
 *******************************************************************************/
 
+// compiler error handling
+#include "Compiler_Errors.h"
+
 #include <MPR121.h>
 #include <Wire.h>
 
